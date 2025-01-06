@@ -5,6 +5,8 @@ from myapp.forms import SignUpForm,SignInForm
 
 from django.contrib.auth.models import User
 
+from django.contrib.auth import authenticate,login,logout
+
 class SignUpView(View):
 
     def get(self,request,*args,**kwargs):
@@ -42,14 +44,56 @@ class SignInView(View):
     
     def post(self,request,*args,**kwrags):
 
-        # step1 extract username,password
-        # chk credential are valid
-        # start the session
-        pass
-    
+        form_data=request.POST
 
-# django.contrib.auth
-# models
-# AbstractBaseUser
-# AbstractUser
-# User=>
+        form_instance=SignInForm(form_data)
+
+        if form_instance.is_valid():
+
+            data=form_instance.cleaned_data
+
+            unmae=data.get("username")
+
+            pwd=data.get("password")
+
+            user_object=authenticate(request,username=unmae,password=pwd)
+
+            if user_object:
+
+                login(request,user_object)
+
+                print(request.user)
+
+                print("session started")
+                return redirect("index")
+            else:
+                print("inavlid")
+
+            return redirect("signin")
+
+                # request.user
+
+
+
+class IndexView(View):
+
+    def get(self,request,*args,**kwargs):
+
+        return render(request,"index.html")
+
+
+
+
+class SignOutView(View):
+
+    def get(self,request,*args,**kwargs):
+
+        logout(request)
+
+        return redirect("signin")
+
+
+
+
+
+       
